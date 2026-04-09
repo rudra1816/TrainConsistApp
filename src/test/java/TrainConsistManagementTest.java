@@ -4,95 +4,97 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class TrainConsistManagementTest {
 
-    // Helper method to create sample data
+    // Helper method
     TrainConsistManagement createApp() {
         TrainConsistManagement app = new TrainConsistManagement();
 
         app.addBogie(new PassengerBogie("Sleeper", 72));
+        app.addBogie(new PassengerBogie("Sleeper", 80));
         app.addBogie(new PassengerBogie("AC Chair", 60));
         app.addBogie(new PassengerBogie("First Class", 40));
-        app.addBogie(new PassengerBogie("AC 2 Tier", 80));
 
         return app;
     }
 
-    // UC8 Tests
+    // UC9 TESTS
 
     @Test
-    void testFilter_CapacityGreaterThanThreshold() {
+    void testGrouping_BogiesGroupedByType() {
         TrainConsistManagement app = createApp();
 
-        List<Bogie> result = app.filterByCapacity(70);
+        Map<String, List<Bogie>> result = app.groupByType();
 
-        assertEquals(2, result.size());
+        assertTrue(result.containsKey("Sleeper"));
+        assertEquals(2, result.get("Sleeper").size());
     }
 
     @Test
-    void testFilter_CapacityEqualToThreshold() {
+    void testGrouping_MultipleBogiesInSameGroup() {
         TrainConsistManagement app = createApp();
 
-        List<Bogie> result = app.filterByCapacity(60);
+        Map<String, List<Bogie>> result = app.groupByType();
 
-        // 60 should NOT be included
-        for (Bogie b : result) {
-            assertTrue(b.capacity > 60);
-        }
+        assertTrue(result.get("Sleeper").size() > 1);
     }
 
     @Test
-    void testFilter_CapacityLessThanThreshold() {
+    void testGrouping_DifferentBogieTypes() {
         TrainConsistManagement app = createApp();
 
-        List<Bogie> result = app.filterByCapacity(70);
+        Map<String, List<Bogie>> result = app.groupByType();
 
-        for (Bogie b : result) {
-            assertTrue(b.capacity > 70);
-        }
+        assertTrue(result.containsKey("Sleeper"));
+        assertTrue(result.containsKey("AC Chair"));
+        assertTrue(result.containsKey("First Class"));
     }
 
     @Test
-    void testFilter_MultipleBogiesMatching() {
-        TrainConsistManagement app = createApp();
-
-        List<Bogie> result = app.filterByCapacity(50);
-
-        assertTrue(result.size() > 1);
-    }
-
-    @Test
-    void testFilter_NoBogiesMatching() {
-        TrainConsistManagement app = createApp();
-
-        List<Bogie> result = app.filterByCapacity(100);
-
-        assertTrue(result.isEmpty());
-    }
-
-    @Test
-    void testFilter_AllBogiesMatching() {
-        TrainConsistManagement app = createApp();
-
-        List<Bogie> result = app.filterByCapacity(30);
-
-        assertEquals(4, result.size());
-    }
-
-    @Test
-    void testFilter_EmptyBogieList() {
+    void testGrouping_EmptyBogieList() {
         TrainConsistManagement app = new TrainConsistManagement();
 
-        List<Bogie> result = app.filterByCapacity(50);
+        Map<String, List<Bogie>> result = app.groupByType();
 
         assertTrue(result.isEmpty());
     }
 
     @Test
-    void testFilter_OriginalListUnchanged() {
+    void testGrouping_SingleBogieCategory() {
+        TrainConsistManagement app = new TrainConsistManagement();
+
+        app.addBogie(new PassengerBogie("Sleeper", 70));
+
+        Map<String, List<Bogie>> result = app.groupByType();
+
+        assertEquals(1, result.size());
+        assertTrue(result.containsKey("Sleeper"));
+    }
+
+    @Test
+    void testGrouping_MapContainsCorrectKeys() {
+        TrainConsistManagement app = createApp();
+
+        Map<String, List<Bogie>> result = app.groupByType();
+
+        assertTrue(result.keySet().contains("Sleeper"));
+        assertTrue(result.keySet().contains("AC Chair"));
+    }
+
+    @Test
+    void testGrouping_GroupSizeValidation() {
+        TrainConsistManagement app = createApp();
+
+        Map<String, List<Bogie>> result = app.groupByType();
+
+        assertEquals(2, result.get("Sleeper").size());
+    }
+
+    @Test
+    void testGrouping_OriginalListUnchanged() {
         TrainConsistManagement app = createApp();
 
         int originalSize = app.bogies.size();
 
-        app.filterByCapacity(60);
+        app.groupByType();
 
         assertEquals(originalSize, app.bogies.size());
     }
