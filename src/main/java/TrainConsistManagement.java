@@ -2,19 +2,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 // UC1 - Base Bogie class
-class Bogie {
-    String type;
-    int capacity;
 
-    Bogie(String type, int capacity) {
-        this.type = type;
-        this.capacity = capacity;
-    }
-
-    public String toString() {
-        return type + " (Capacity: " + capacity + ")";
-    }
-}
 
 // UC2 - Passenger Bogie
 class PassengerBogie extends Bogie {
