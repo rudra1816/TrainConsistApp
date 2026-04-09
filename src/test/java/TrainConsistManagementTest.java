@@ -107,4 +107,37 @@ void testRegex_InvalidTrainIDFormat() {
     assertFalse(app.isValidTrainId("TRN12A"));
     assertFalse(app.isValidTrainId("1234-TRN"));
 }
+    @Test
+    void testSafety_AllBogiesValid() {
+        TrainConsistManagement app = new TrainConsistManagement();
+
+        app.addBogie(new GoodsBogie("Cylindrical", 100, "Petroleum"));
+
+        assertTrue(app.isTrainSafe());
+    }
+
+    @Test
+    void testSafety_CylindricalWithInvalidCargo() {
+        TrainConsistManagement app = new TrainConsistManagement();
+
+        app.addBogie(new GoodsBogie("Cylindrical", 100, "Coal"));
+
+        assertFalse(app.isTrainSafe());
+    }
+
+    @Test
+    void testSafety_NonCylindricalAllowed() {
+        TrainConsistManagement app = new TrainConsistManagement();
+
+        app.addBogie(new GoodsBogie("Rectangular", 100, "Coal"));
+
+        assertTrue(app.isTrainSafe());
+    }
+
+    @Test
+    void testSafety_EmptyList() {
+        TrainConsistManagement app = new TrainConsistManagement();
+
+        assertTrue(app.isTrainSafe());
+    }
 }

@@ -1,8 +1,6 @@
 import java.util.*;
-import java.util.stream.Collectors;
+import java.util.stream.*;
 import java.util.regex.Pattern;
-
-// UC1 - Base Bogie class
 
 
 // UC2 - Passenger Bogie
@@ -20,9 +18,17 @@ class GoodsBogie extends Bogie {
         super(type, capacity);
         this.cargoType = cargoType;
     }
+
+    public String getCargoType() {
+        return cargoType;
+    }
+
+    public String toString() {
+        return type + " | Cargo: " + cargoType + " (Capacity: " + capacity + ")";
+    }
 }
 
-// UC4–UC9 - Main Management Class
+// MAIN CLASS
 public class TrainConsistManagement {
 
     List<Bogie> bogies = new ArrayList<>();
@@ -32,46 +38,34 @@ public class TrainConsistManagement {
         bogies.add(b);
     }
 
-    // UC5 - Display all bogies
+    // UC5 - Display
     void displayAll() {
         bogies.forEach(System.out::println);
     }
 
-    // UC6 - Total capacity
+    // UC6 - Total Capacity
     int totalCapacity() {
         return bogies.stream().mapToInt(b -> b.capacity).sum();
     }
 
-    // UC7 - Sort bogies by capacity
+    // UC7 - Sort
     void sortBogies() {
         bogies.sort(Comparator.comparingInt(b -> b.capacity));
     }
 
-    // UC8 - Filter bogies using Streams
+    // UC8 - Filter
     List<Bogie> filterByCapacity(int threshold) {
         return bogies.stream()
                 .filter(b -> b.capacity > threshold)
                 .collect(Collectors.toList());
     }
 
-    // UC11 - Validate Train ID
-    boolean isValidTrainId(String trainId) {
-        String regex = "TRN-\\d{4}";
-        return Pattern.matches(regex, trainId);
-    }
-
-    // UC11 - Validate Cargo Code
-    boolean isValidCargoCode(String cargoCode) {
-        String regex = "PET-[A-Z]{2}";
-        return Pattern.matches(regex, cargoCode);
-    }
-    // UC9 - Group bogies by type
+    // UC9 - Group
     Map<String, List<Bogie>> groupByType() {
         return bogies.stream()
                 .collect(Collectors.groupingBy(b -> b.type));
     }
 
-    // Display grouped data
     void displayGrouped(Map<String, List<Bogie>> map) {
         map.forEach((type, list) -> {
             System.out.println(type + ":");
@@ -79,46 +73,78 @@ public class TrainConsistManagement {
         });
     }
 
-    // MAIN METHOD (Demo)
+    // UC10 - Reduce
+    int totalSeatsUsingReduce() {
+        return bogies.stream()
+                .map(b -> b.capacity)
+                .reduce(0, Integer::sum);
+    }
+
+    // UC11 - Regex Validation
+    boolean isValidTrainId(String trainId) {
+        return Pattern.matches("TRN-\\d{4}", trainId);
+    }
+
+    boolean isValidCargoCode(String cargoCode) {
+        return Pattern.matches("PET-[A-Z]{2}", cargoCode);
+    }
+
+    // UC12 - Safety Check
+    boolean isTrainSafe() {
+        return bogies.stream()
+                .filter(b -> b instanceof GoodsBogie)
+                .map(b -> (GoodsBogie) b)
+                .allMatch(g ->
+                        !g.type.equalsIgnoreCase("Cylindrical") ||
+                                g.getCargoType().equalsIgnoreCase("Petroleum")
+                );
+    }
+
+    // MAIN METHOD
     public static void main(String[] args) {
+
         TrainConsistManagement app = new TrainConsistManagement();
 
-        // UC1–UC3 sample data
+        // Sample Data
         app.addBogie(new PassengerBogie("Sleeper", 72));
         app.addBogie(new PassengerBogie("AC Chair", 60));
         app.addBogie(new PassengerBogie("First Class", 40));
         app.addBogie(new PassengerBogie("Sleeper", 80));
-        app.addBogie(new GoodsBogie("Rectangular", 100, "Coal"));
 
-        // UC5 - Display
+        app.addBogie(new GoodsBogie("Rectangular", 100, "Coal"));
+        app.addBogie(new GoodsBogie("Cylindrical", 120, "Petroleum")); // valid
+        // app.addBogie(new GoodsBogie("Cylindrical", 90, "Coal")); // try this → unsafe
+
+        // UC5
         System.out.println("All Bogies:");
         app.displayAll();
 
-        // UC6 - Total Capacity
+        // UC6
         System.out.println("\nTotal Capacity: " + app.totalCapacity());
 
-        // UC7 - Sort
+        // UC7
         app.sortBogies();
         System.out.println("\nSorted Bogies:");
         app.displayAll();
 
-        // UC8 - Filter
-        System.out.println("\nFiltered Bogies (>60):");
-        List<Bogie> filtered = app.filterByCapacity(60);
-        filtered.forEach(System.out::println);
+        // UC8
+        System.out.println("\nFiltered (>60):");
+        app.filterByCapacity(60).forEach(System.out::println);
 
-        // UC9 - Group
-        System.out.println("\nGrouped Bogies:");
-        Map<String, List<Bogie>> grouped = app.groupByType();
-        app.displayGrouped(grouped);
-        // UC11 - Regex Validation
-        String trainId = "TRN-1234";
-        String cargoCode = "PET-AB";
+        // UC9
+        System.out.println("\nGrouped:");
+        app.displayGrouped(app.groupByType());
 
-        System.out.println("\nTrain ID Validation:");
-        System.out.println(trainId + " -> " + (app.isValidTrainId(trainId) ? "Valid" : "Invalid"));
+        // UC10
+        System.out.println("\nTotal Seats (Reduce): " + app.totalSeatsUsingReduce());
 
-        System.out.println("\nCargo Code Validation:");
-        System.out.println(cargoCode + " -> " + (app.isValidCargoCode(cargoCode) ? "Valid" : "Invalid"));
+        // UC11
+        System.out.println("\nRegex Validation:");
+        System.out.println("TRN-1234 -> " + (app.isValidTrainId("TRN-1234") ? "Valid" : "Invalid"));
+        System.out.println("PET-AB -> " + (app.isValidCargoCode("PET-AB") ? "Valid" : "Invalid"));
+
+        // UC12
+        System.out.println("\nSafety Check:");
+        System.out.println(app.isTrainSafe() ? "Train is SAFE" : "Train is UNSAFE");
     }
 }
