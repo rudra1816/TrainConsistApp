@@ -98,4 +98,13 @@ class TrainConsistManagementTest {
 
         assertEquals(originalSize, app.bogies.size());
     }
+
+@Test
+void testRegex_InvalidTrainIDFormat() {
+    TrainConsistManagement app = new TrainConsistManagement();
+
+    assertFalse(app.isValidTrainId("TRAIN12"));
+    assertFalse(app.isValidTrainId("TRN12A"));
+    assertFalse(app.isValidTrainId("1234-TRN"));
+}
 }

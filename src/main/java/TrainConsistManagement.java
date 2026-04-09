@@ -1,5 +1,6 @@
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.regex.Pattern;
 
 // UC1 - Base Bogie class
 
@@ -53,6 +54,17 @@ public class TrainConsistManagement {
                 .collect(Collectors.toList());
     }
 
+    // UC11 - Validate Train ID
+    boolean isValidTrainId(String trainId) {
+        String regex = "TRN-\\d{4}";
+        return Pattern.matches(regex, trainId);
+    }
+
+    // UC11 - Validate Cargo Code
+    boolean isValidCargoCode(String cargoCode) {
+        String regex = "PET-[A-Z]{2}";
+        return Pattern.matches(regex, cargoCode);
+    }
     // UC9 - Group bogies by type
     Map<String, List<Bogie>> groupByType() {
         return bogies.stream()
@@ -99,5 +111,14 @@ public class TrainConsistManagement {
         System.out.println("\nGrouped Bogies:");
         Map<String, List<Bogie>> grouped = app.groupByType();
         app.displayGrouped(grouped);
+        // UC11 - Regex Validation
+        String trainId = "TRN-1234";
+        String cargoCode = "PET-AB";
+
+        System.out.println("\nTrain ID Validation:");
+        System.out.println(trainId + " -> " + (app.isValidTrainId(trainId) ? "Valid" : "Invalid"));
+
+        System.out.println("\nCargo Code Validation:");
+        System.out.println(cargoCode + " -> " + (app.isValidCargoCode(cargoCode) ? "Valid" : "Invalid"));
     }
 }
