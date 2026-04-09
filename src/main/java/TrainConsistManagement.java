@@ -3,6 +3,7 @@ import java.util.stream.*;
 import java.util.regex.Pattern;
 
 
+
 // UC2 - Passenger Bogie
 class PassengerBogie extends Bogie {
     PassengerBogie(String type, int capacity) {
@@ -100,6 +101,40 @@ public class TrainConsistManagement {
                 );
     }
 
+    // UC13 - Performance Comparison
+    void performanceComparison(int capacityThreshold) {
+        // Loop-based
+        long startLoop = System.nanoTime();
+        List<Bogie> loopResult = new ArrayList<>();
+        for (Bogie b : bogies) {
+            if (b.capacity > capacityThreshold) {
+                loopResult.add(b);
+            }
+        }
+        long endLoop = System.nanoTime();
+        long loopTime = endLoop - startLoop;
+
+        // Stream-based
+        long startStream = System.nanoTime();
+        List<Bogie> streamResult = bogies.stream()
+                .filter(b -> b.capacity > capacityThreshold)
+                .collect(Collectors.toList());
+        long endStream = System.nanoTime();
+        long streamTime = endStream - startStream;
+
+        // Display Results
+        System.out.println("\nPerformance Comparison (Filtering Capacity > " + capacityThreshold + "):");
+        System.out.println("Loop Result Size: " + loopResult.size() + ", Time: " + loopTime + " ns");
+        System.out.println("Stream Result Size: " + streamResult.size() + ", Time: " + streamTime + " ns");
+
+        // Optional: verify results match
+        if (loopResult.size() == streamResult.size()) {
+            System.out.println("✅ Both methods produce identical results.");
+        } else {
+            System.out.println("❌ Results differ!");
+        }
+    }
+
     // MAIN METHOD
     public static void main(String[] args) {
 
@@ -113,7 +148,6 @@ public class TrainConsistManagement {
 
         app.addBogie(new GoodsBogie("Rectangular", 100, "Coal"));
         app.addBogie(new GoodsBogie("Cylindrical", 120, "Petroleum")); // valid
-        // app.addBogie(new GoodsBogie("Cylindrical", 90, "Coal")); // try this → unsafe
 
         // UC5
         System.out.println("All Bogies:");
@@ -146,5 +180,8 @@ public class TrainConsistManagement {
         // UC12
         System.out.println("\nSafety Check:");
         System.out.println(app.isTrainSafe() ? "Train is SAFE" : "Train is UNSAFE");
+
+        // UC13
+        app.performanceComparison(60);
     }
 }
